@@ -45,7 +45,7 @@ function setWallpaper(url, hash, message) {
 
 
 function onAlarm() {
-    console.log(new Date().toString() + 'Got Alarm! Updating wallpaper ...');
+    console.log(new Date().toString() + ' Alarm set off! Checking if new wallpaper is available ...');
     // First get JSON describing latest Bing wallpapers.
     let xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8');
@@ -121,7 +121,7 @@ function start() {
     // try refreshing wallpaper every half an hour
     let alarm = 30;
     chrome.alarms.create("update", {"delayInMinutes": 3,"periodInMinutes": alarm});
-    console.log(new Date().toString() + ' background set alarm to ' + alarm + ' minutes');
+    console.log(new Date().toString() + ' Set alarm to ' + alarm + ' minutes');
 }
 
 
