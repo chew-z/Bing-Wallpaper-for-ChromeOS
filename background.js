@@ -4,15 +4,17 @@
 
 
 function sendNotification(msg, buff) {
+    // First we have to convert arraybuffer (of an image) to url of a blob for notification
     let blob = new Blob( [ buff ], { type: "image/jpeg" } );
     let urlCreator = window.URL || window.webkitURL;
     let imageUrl = urlCreator.createObjectURL( blob );
-    chrome.notifications.create("bingwall", {
+    // Now we can send notification with wallpaper miniature
+    chrome.notifications.create("wallpaper-available", {
         type: 'basic',
         iconUrl: imageUrl,
-        title: "Bing Wallpaper for Chromebook",
+        title: "New Bing Wallpaper available",
         message: msg,
-        contextMessage: "New wallpaper downloaded"
+        contextMessage: "Set as desktop wallpaper"
     },() => {}) 
 }
 
@@ -25,11 +27,13 @@ function setWallpaper(url, hash, message) {
     xhr.onload = function() { 
         buffer = xhr.response;
         if (buffer) { 
+            let filename = url.substring(url.lastIndexOf("/") + 1);
             chrome.wallpaper.setWallpaper({
+                // We can provide wallpaper image either as url or arraybuffer
                 // 'url': 'https://www.bing.com'+ url,
                 'data': buffer,
-                'layout': 'CENTER',  // STRETCH or CENTER
-                'filename': 'bing_wallpaper'
+                'layout': 'STRETCH',  // STRETCH or CENTER
+                'filename': filename
             }, () => {
                 chrome.storage.local.set({lastHash: hash});
                 sendNotification(message, buffer);
