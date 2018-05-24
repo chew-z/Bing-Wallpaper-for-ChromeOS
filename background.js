@@ -2,6 +2,54 @@
 
 'use strict'
 
+var refresh_interval = 30;     //In minutes
+var wallpaper_position = "STRETCH";
+var debug = true;
+
+/*
+Logs that storage area that changed,
+then for each item changed,
+log its old value and its new value.
+*/
+function logStorageChange(changes, area) {
+    if(debug) {
+        console.log("Change in storage area: " + area);
+        let changedItems = Object.keys(changes);
+        changedItems.forEach( (key) => {
+            console.log(key + " has changed:");
+            console.log("Old value: ");
+            console.log(changes[key].oldValue);
+            console.log("New value: ");
+            console.log(changes[key].newValue);
+        });
+    }
+}
+
+
+function doStorageChange(changes, area) {
+    let changedItems = Object.keys(changes);
+    changedItems.forEach( (key) =>  {
+        if(key == "wallpaper_position") wallpaper_position = changes[key].newValue;
+        if(key == "refresh_interval") {
+            refresh_interval =  changes[key].newValue;
+            chrome.alarms.clear("bing-wallpaper-update");
+            chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
+            console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
+        }
+    });
+    logStorageChange(changes, area);
+}
+
+
+function restoreOptions() {
+    chrome.storage.sync.get("refresh_interval", (obj) => {
+        if(obj.hasOwnProperty("refresh_interval")) refresh_interval = obj.refresh_interval;
+    });
+    chrome.storage.sync.get("wallpaper_position", (obj) => {
+        if(obj.hasOwnProperty("wallpaper_position")) wallpaper_position = obj.wallpaper_position;
+    });
+}
+
 
 function sendNotification(msg, buff) {
     // First we have to convert arraybuffer (of an image) to url of a blob for notification
@@ -32,7 +80,7 @@ function setWallpaper(url, hash, message) {
                 // We can provide wallpaper image either as url or arraybuffer
                 // 'url': 'https://www.bing.com'+ url,
                 'data': buffer,
-                'layout': 'STRETCH',  // STRETCH or CENTER
+                'layout': wallpaper_position,  // STRETCH or CENTER
                 'filename': filename
             }, () => {
                 chrome.storage.local.set({lastHash: hash});
@@ -115,13 +163,14 @@ function onAlarm() {
 
 
 chrome.alarms.onAlarm.addListener(onAlarm);
+chrome.storage.onChanged.addListener(doStorageChange);
 
 
 function start() {
+    restoreOptions();
     // try refreshing wallpaper every half an hour
-    let alarm = 30;
-    chrome.alarms.create("update", {"delayInMinutes": 3,"periodInMinutes": alarm});
-    console.log(new Date().toString() + ' Set alarm to ' + alarm + ' minutes');
+    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
+    console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
 }
 
 
