@@ -5,6 +5,7 @@
 var refresh_interval = 30;     //In minutes
 var wallpaper_position = "STRETCH";
 var debug = true;
+var WallpapersList = [];
 
 /*
 Logs that storage area that changed,
@@ -117,39 +118,39 @@ function onAlarm() {
                             console.log(new Date().toString() + ' New wallpaper not available');
                     });
                 }
-                // myHashArray stores hashes of wallpapers downloaded so far
-                chrome.storage.sync.get('myHashArray', (obj) => {
-                    let hashArray = [];
-                    if(obj.hasOwnProperty('myHashArray')) {
-                        hashArray = obj.myHashArray;
-                        console.log('Found in storage ' + JSON.stringify(hashArray));
+                // myWallapersList stores paths of wallpapers downloaded so far (relative to Downloads)
+                chrome.storage.sync.get('myWallapersList', (obj) => {
+                    WallpapersList = [];
+                    if(obj.hasOwnProperty('myWallapersList')) {
+                        WallpapersList = obj.myWallapersList;
+                        console.log('Found in storage ' + JSON.stringify(WallpapersList));
                     }
                     // download all available wallpapers that we have not downloaded previously
                     json.images.forEach( (image) => {
-                        let hash = image.hsh;
-                        if( hashArray.includes(hash) )
+                        // let hash = image.hsh;
+                        let url = image.url;
+                        let filepath = 'Media/Pictures/Bing' + url.substring(url.lastIndexOf("/"));
+                        if( WallpapersList.includes(filepath) )
                             // pass
-                            console.log('Found ' + hash);
+                            console.log('Found ' + filepath);
                         else {
-                            // add current hash to hashArray
-                            hashArray.push(hash);
-                            // console.log('hashArray updated ' + JSON.stringify(hashArray));
-                            let url = image.url;
-                            let filename = 'Media/Pictures/Bing' + url.substring(url.lastIndexOf("/"));
-                            console.log('Downloading ' + filename);
+                            // add current filepath to WallpapersList
+                            WallpapersList.push(filepath);
+                            // console.log('WallpapersList updated ' + JSON.stringify(WallpapersList));
+                            console.log('Downloading ' + filepath);
                             chrome.downloads.download({
                                 url: 'https://www.bing.com' + url,
-                                filename: filename,
+                                filename: filepath,
                                 conflictAction: 'overwrite'
                             });
                         }
                     });
-                    // after looping over all available wallpapers update myHashArray in storage
-                    chrome.storage.sync.set({ myHashArray: hashArray }, () => {
+                    // after looping over all available wallpapers update myWallapersList in storage
+                    chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
                         if (chrome.runtime.lastError)
                             console.log(chrome.runtime.lastError);
                         else
-                            console.log(new Date().toString() + ' hashArray saved ' + JSON.stringify(hashArray));
+                            console.log(new Date().toString() + ' WallpapersList saved ' + JSON.stringify(WallpapersList));
                     });
                 });
             } else {
@@ -169,7 +170,7 @@ chrome.storage.onChanged.addListener(doStorageChange);
 function start() {
     restoreOptions();
     // try refreshing wallpaper every half an hour
-    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
+    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 1,"periodInMinutes": parseInt(refresh_interval)});
     console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
 }
 
