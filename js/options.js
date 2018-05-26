@@ -70,7 +70,7 @@ function addImages(imgs) {
     let wallpapers = document.getElementById("wallpapers");
     let row;
     imgs.forEach( (img, i) => {
-        console.log('i = ' + i);
+        // console.log('i = ' + i);
         if ( !odd(i) ) {
             row = document.createElement("div");
             row.className += "row";
@@ -78,10 +78,13 @@ function addImages(imgs) {
         let column = document.createElement("div");
         column.className += "col feature";
         column.innerHTML = '<p>' + pathToName(img.filename) + '</p>';
+        let a = document.createElement("a");
+        a.href = img.url;
         let wallpaper_image = document.createElement("img");
         wallpaper_image.className += "wallpaper";
         addImage(img.filename, wallpaper_image);
-        column.appendChild(wallpaper_image);
+        a.appendChild(wallpaper_image);
+        column.appendChild(a);
         row.appendChild(column);
         if ( odd(i) ) {
             wallpapers.appendChild(row);
@@ -95,11 +98,11 @@ function addImages(imgs) {
 document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = document.getElementById("refreshInterval");
     let selectPosition = document.getElementById("selectPosition");
-    let limit = 24; // TODO add as configurable option
+    let limitDisplayed = 24; // TODO add as configurable option
 
     refreshInterval.value = background.refresh_interval;
     selectPosition.value = background.wallpaper_position;
-    limit = background.limit_displayed;
+    limitDisplayed = background.limit_displayed;
     // let wallpapers = background.WallpapersList;
     // console.log('wallpapers ' + wallpapers);
 
@@ -115,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.downloads.search({
                 query: ["Media/Pictures/Bing"],
                 filenameRegex: '.+_1920x1080\.jpg$',
-                limit: limit },
+                limit: limitDisplayed },
             (wpp) => {
             if(wpp.length)  // not empty list
                 addImages(uniqWallpapers(wpp));
