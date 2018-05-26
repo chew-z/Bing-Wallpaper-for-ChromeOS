@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Bing Wallpaper for ChromeOS</title>
+        <link rel="shortcut icon" href="/icons/16.png" />
+        <meta name="viewport" content="width=device-width">
+        <script type="text/javascript" src="/js/options.js"></script>
+        <link rel="stylesheet" href="/css/grid.css">
+        <link rel="stylesheet" href="/css/style.css" / >
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+        <!-- general boring stuff and some visual tweaks -->
+        <!-- link rel="stylesheet" href="css/screen.css" -->
+    </head>
+    <body class="body">
+        <div id="container" class="container">
+            <div class="row col">
+                <img src="/icons/128.png" class="logo">
+                <h1 class="heading">Bing Wallpaper for ChromeOS</h1>
+            </div>
+            <div class="row">
+                <div id="wallpapers" class="col content">
+                <!-- Generate automatically with options.js
+                    <div class="row">
+                        <div class="col feature">
+                            <img class="wallpaper" src="img/TharDesertRajasthan_ROW10032703065_1920x1080.jpg">
+                            <p>TharDesertRajasthan_ROW10032703065_1920x1080.jpg</p>
+                        </div>
+                        <div class="col feature">
+                            <img class="wallpaper" src="img/Sunbird1_ROW12058461588_1920x1080.jpg"/>
+                            <p>Sunbird1_ROW12058461588_1920x1080.jpg</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col feature">
+                            <img class="wallpaper" src="img/WineDay_ROW11240086517_1920x1080.jpg">
+                            <p>WineDay_ROW11240086517_1920x1080.jpg</p>
+                        </div>
+                        <div class="col feature">
+                            <img class="wallpaper" src="img/ShediacMarshland_ROW10694874486_1920x1080.jpg"/>
+                            <p>ShediacMarshland_ROW10694874486_1920x1080.jpg</p>
+                        </div>
+                    </div>
+                -->
+                </div>
+                <div class="col sidebar">
+                    <label for="refreshInterval">Wallpaper background check interval (min)</label>
+                    <input id="refreshInterval" type="number" class="input-option" min="30" step="15" max="1440" value="60">
+                    <div id="positionSelection" class="">
+                        <div class="">
+                            <label for="selectPosition" class="">Wallpaper position</label>
+                        </div>
+                        <div class="">
+                            <select id="selectPosition" name="select"> 
+                                <option value="STRETCH" >Stretch</option>
+                                <option value="CENTER">Center</option> 
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

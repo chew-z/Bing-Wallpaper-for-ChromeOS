@@ -1,0 +1,33 @@
+
+body {
+    font-family: 'Roboto Slab', serif;
+}
+
+.input {
+    float: left;
+}
+
+.input-option {
+    font-weight:bold;
+    text-align: right;
+}
+
+.input-list {
+    font-weight:bold;
+}
+
+.logo {
+    height: auto; 
+    width: auto; 
+    max-width: 128px; 
+    max-height: 128px;
+    float: right;
+}
+.wallpaper {
+    height: auto; 
+    width: auto; 
+    max-width: 100%; 
+}
+
+
+

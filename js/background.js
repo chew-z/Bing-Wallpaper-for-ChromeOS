@@ -6,6 +6,7 @@ var refresh_interval = 30;     //In minutes
 var wallpaper_position = "STRETCH";
 var debug = true;
 var WallpapersList = [];
+var limit_displayed = 24;
 
 /*
 Logs that storage area that changed,
@@ -170,7 +171,7 @@ chrome.storage.onChanged.addListener(doStorageChange);
 function start() {
     restoreOptions();
     // try refreshing wallpaper every half an hour
-    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 1,"periodInMinutes": parseInt(refresh_interval)});
+    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
     console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
 }
 

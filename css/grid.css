@@ -1,0 +1,43 @@
+/* Dead Simple Grid (c) 2015 Vladimir Agafonkin */
+
+/* general boring stuff and some visual tweaks */
+import url("screen.css"); 
+
+
+.row .row { margin:  0 -1.5em; }
+.col      { padding: 0  1.5em; }
+
+.row:after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+@media only screen { .col {
+        float: left;
+        width: 100%;
+        box-sizing: border-box;
+}}
+
+/* all the important responsive layout stuff */
+.container { max-width: 90em; }
+
+/* you only need width to set up columns; all columns are 100%-width by default, so we start
+from a one-column mobile layout and gradually improve it according to available screen space */
+
+@media only screen and (min-width: 34em) {
+    .feature, .info { width: 50%; }
+}
+
+@media only screen and (min-width: 54em) {
+    .content { width: 66.66%; }
+    .sidebar { width: 33.33%; }
+    .info    { width: 100%;   }
+}
+
+@media only screen and (min-width: 76em) {
+    .content { width: 58.33%; } /* 7/12 */
+    .sidebar { width: 41.66%; } /* 5/12 */
+    .info    { width: 50%;    }
+}
+
