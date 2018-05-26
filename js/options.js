@@ -82,7 +82,14 @@ function addImages(imgs) {
         a.href = img.url;
         let wallpaper_image = document.createElement("img");
         wallpaper_image.className += "wallpaper";
-        addImage(img.filename, wallpaper_image);
+        chrome.extension.isAllowedFileSchemeAccess( (allowed) => {
+            if (allowed) {
+                console.log("file access allowed");
+                addImage(img.filename, wallpaper_image);
+            } else { // This should be fallback
+                wallpaper_image.src = img.url;
+            }
+        });
         a.appendChild(wallpaper_image);
         column.appendChild(a);
         row.appendChild(column);
