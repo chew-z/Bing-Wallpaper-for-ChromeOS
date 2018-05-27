@@ -183,18 +183,23 @@ function Rotate() {
     let filename = url.substring(url.lastIndexOf("/") + 1);
     // setWallpaper(imgURL, hash, copy);
     chrome.wallpaper.setWallpaper({
-                // We can provide wallpaper image either as url or arraybuffer
-                'url': 'https://www.bing.com'+ url,
-                // 'data': buffer,
-                'layout': wallpaper_position,  // STRETCH or CENTER
-                'filename': filename
-            }, () => {
-                // chrome.storage.local.set({lastHash: hash});
-                // sendNotification(message, buffer);
-            });
+        // We can provide wallpaper image either as url or arraybuffer
+        'url': 'https://www.bing.com'+ url,
+        // 'data': buffer,
+        'layout': wallpaper_position,  // STRETCH or CENTER
+        'filename': filename
+    }, () => {
+        // chrome.storage.local.set({lastHash: hash});
+        // sendNotification(message, buffer);
+    });
     console.log(new Date().toString() + ' wallpaper rotated ' + url);
 }
-
+// When clicked extension icon
+// chrome.browserAction.onClicked will not fire if the browser action has a popup
+// https://developer.chrome.com/extensions/browserAction#event-onClicked
+chrome.browserAction.onClicked.addListener( (activeTab) => {
+    chrome.tabs.create({'url': "/html/options.html" } )
+})
 
 chrome.alarms.onAlarm.addListener( (alarm) => {
     console.log('Alarm fired!' + JSON.stringify(alarm));
@@ -205,8 +210,24 @@ chrome.alarms.onAlarm.addListener( (alarm) => {
     }
 });
 chrome.storage.onChanged.addListener(doStorageChange);
-
-
+// Handling incoming messages
+chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
+    if (request.from == "options") {
+        console.log("Pop from options " + request.subject + " " + request.action + " " + request.url);
+        if(request.subject == 'action' && request.action == 'change_wallpaper') {
+            // setWallpaper(imgURL, hash, copy);
+            let filename = request.url.substring(request.url.lastIndexOf("/") + 1);
+            chrome.wallpaper.setWallpaper({
+                // We can provide wallpaper image either as url or arraybuffer
+                'url': request.url,
+                'layout': wallpaper_position,  // STRETCH or CENTER
+                'filename': filename
+            }, () => {
+                console.log(new Date().toString() + ' wallpaper rotated ' + request.url);
+            });
+        }
+    }
+});
 function start() {
     restoreOptions();
     // try updating wallpaper every half an hour

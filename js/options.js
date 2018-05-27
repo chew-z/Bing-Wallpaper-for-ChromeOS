@@ -21,21 +21,22 @@ function pathToName(fp) {
     return name;
 }
 
-function uniqWallpapers(a) {
-// Because Chrome brogrammers are dumb and chrome.downloads.search returns duplicates
-// https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
-// adjusted for our needs (unique filepath)
-    let seen = {};
-    return a.filter( (item) => {
-        return seen.hasOwnProperty(item.filename) ? false : (seen[item.filename] = true);
-    });
-}
-
 function odd(i) {
     if(i & 1) 
         return true
     else
         return false
+}
+
+
+function uniqWallpapers(a) {
+    // Because Chrome brogrammers are dumb and chrome.downloads.search returns duplicates
+    // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
+    // adjusted for our needs (unique filepath)
+    let seen = {};
+    return a.filter( (item) => {
+        return seen.hasOwnProperty(item.filename) ? false : (seen[item.filename] = true);
+    });
 }
 
 
@@ -66,22 +67,33 @@ function addImages(imgs) {
         }
         let column = document.createElement("div");
         column.className += "col feature";
-        column.innerHTML = '<p>' + pathToName(img.filename) + '</p>';
-        let a = document.createElement("a");
-        a.href = img.url;
+        column.innerHTML = '<p><a href=' + img.url + '>' + pathToName(img.filename) + '</a></p>';
+        // let a = document.createElement("a");
+        // a.href = img.url;
         let wallpaper_image = document.createElement("img");
         wallpaper_image.className += "wallpaper";
         chrome.extension.isAllowedFileSchemeAccess( (allowed) => {
             if (allowed) {
-                console.log("file access allowed");
+                // console.log("file access allowed");
                 addImage(img.filename, wallpaper_image);
             } else { // This should be fallback
                 wallpaper_image.src = img.url;
             }
         });
-        a.appendChild(wallpaper_image);
-        column.appendChild(a);
+        wallpaper_image.addEventListener('click', () => { 
+            // background.js
+            chrome.runtime.sendMessage({
+                "from": "options",
+                "subject": "action",
+                "action": "change_wallpaper",
+                "url": img.url
+            });
+        });
+        column.appendChild(wallpaper_image);
+        // a.appendChild(wallpaper_image);
+        // column.appendChild(a);
         row.appendChild(column);
+        // every odd and last image - two images per row
         if ( odd(i) ) {
             wallpapers.appendChild(row);
         } else {
@@ -101,9 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
     rotateInterval.value = background.rotate_interval;
     selectPosition.value = background.wallpaper_position;
     limitDisplayed = background.limit_displayed;
-    // let wallpapers = background.WallpapersList;
-    // console.log('wallpapers ' + wallpapers);
 
+    // add listeners for options change
     refreshInterval.addEventListener("input", () => {
         chrome.storage.sync.set({ "refresh_interval": refreshInterval.value } );
     });
@@ -113,17 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPosition.addEventListener("change", () => {
         chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
     });
-//    if (wallpapers.length > 0 ) {
-        // chrome.downloads.search({query: ["Media/Pictures/Bing"], limit: 24}, (wpp) => {
-        let regex = new RegExp('/*jpg$/');
-        chrome.downloads.search({
-                query: ["Media/Pictures/Bing"],
-                filenameRegex: '.+_1920x1080\.jpg$',
-                limit: limitDisplayed },
-            (wpp) => {
+    // create grid with wallpapers
+    chrome.downloads.search({
+        query: ["Media/Pictures/Bing"],
+        filenameRegex: '.+_1920x1080\.jpg$',
+        limit: limitDisplayed },
+        (wpp) => {
             if(wpp.length)  // not empty list
                 addImages(uniqWallpapers(wpp));
         });
-    //    }
-
+    let images = document.getElementsByClassName('wallpaper');
+    for (var i = 0; i < images.length; i++) {
+            };
 });

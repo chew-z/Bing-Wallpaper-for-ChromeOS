@@ -11,7 +11,7 @@ I had missed my scripts for downloading and rotating wallpapers from Bing on mac
 - ~~Rotate wallpapers~~
 - Make proper options page
   - ~~Show gallery of pictures available offline (already downloaded)~~
-  - and let set selected as wallpaper
+  - ~~and let set selected as wallpaper~~
   - Make downloads optional
   - Allow user to choose folder for downloading wallpapers
   - ~~Allow setting alarm's interval (checking for new wallpapers)~~
