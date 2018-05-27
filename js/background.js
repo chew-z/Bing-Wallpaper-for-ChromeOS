@@ -2,11 +2,17 @@
 
 'use strict'
 
-var refresh_interval = 30;     //In minutes
+var refresh_interval = 180;     //In minutes
+var rotate_interval = 60;     //In minutes
 var wallpaper_position = "STRETCH";
 var debug = true;
 var WallpapersList = [];
 var limit_displayed = 24;
+
+
+function roll(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 /*
 Logs that storage area that changed,
@@ -37,6 +43,12 @@ function doStorageChange(changes, area) {
             chrome.alarms.clear("bing-wallpaper-update");
             chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
             console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
+        }
+        if(key == "rotate_interval") {
+            rotate_interval =  changes[key].newValue;
+            chrome.alarms.clear("bing-wallpaper-rotate");
+            chrome.alarms.create("bing-wallpaper-rotate", {"delayInMinutes": 3,"periodInMinutes": parseInt(rotate_interval)});
+            console.log(new Date().toString() + ' Set alarm to ' + rotate_interval + ' minutes');
         }
     });
     logStorageChange(changes, area);
@@ -94,7 +106,7 @@ function setWallpaper(url, hash, message) {
 }
 
 
-function onAlarm() {
+function Update() {
     console.log(new Date().toString() + ' Alarm set off! Checking if new wallpaper is available ...');
     // First get JSON describing latest Bing wallpapers.
     let xhr = new XMLHttpRequest();
@@ -131,12 +143,12 @@ function onAlarm() {
                         // let hash = image.hsh;
                         let url = image.url;
                         let filepath = 'Media/Pictures/Bing' + url.substring(url.lastIndexOf("/"));
-                        if( WallpapersList.includes(filepath) )
+                        if( WallpapersList.includes(url) )
                             // pass
-                            console.log('Found ' + filepath);
+                            console.log('Found ' + url);
                         else {
                             // add current filepath to WallpapersList
-                            WallpapersList.push(filepath);
+                            WallpapersList.push(url);
                             // console.log('WallpapersList updated ' + JSON.stringify(WallpapersList));
                             console.log('Downloading ' + filepath);
                             chrome.downloads.download({
@@ -164,15 +176,44 @@ function onAlarm() {
 }
 
 
-chrome.alarms.onAlarm.addListener(onAlarm);
+function Rotate() {
+    console.log(new Date().toString() + ' Alarm set off! Rotating wallpaper ..');
+    let r = roll(0, WallpapersList.length);
+    let url = WallpapersList[r];
+    let filename = url.substring(url.lastIndexOf("/") + 1);
+    // setWallpaper(imgURL, hash, copy);
+    chrome.wallpaper.setWallpaper({
+                // We can provide wallpaper image either as url or arraybuffer
+                'url': 'https://www.bing.com'+ url,
+                // 'data': buffer,
+                'layout': wallpaper_position,  // STRETCH or CENTER
+                'filename': filename
+            }, () => {
+                // chrome.storage.local.set({lastHash: hash});
+                // sendNotification(message, buffer);
+            });
+    console.log(new Date().toString() + ' wallpaper rotated ' + url);
+}
+
+
+chrome.alarms.onAlarm.addListener( (alarm) => {
+    console.log('Alarm fired!' + JSON.stringify(alarm));
+    if (alarm.name == "bing-wallpaper-update") { 
+        Update();
+    } else {
+        Rotate();
+    }
+});
 chrome.storage.onChanged.addListener(doStorageChange);
 
 
 function start() {
     restoreOptions();
-    // try refreshing wallpaper every half an hour
-    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
+    // try updating wallpaper every half an hour
+    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 1,"periodInMinutes": parseInt(refresh_interval)});
     console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
+    chrome.alarms.create("bing-wallpaper-rotate", {"delayInMinutes": 5,"periodInMinutes": parseInt(rotate_interval)});
+    console.log(new Date().toString() + ' Set alarm to ' + rotate_interval + ' minutes');
 }
 
 

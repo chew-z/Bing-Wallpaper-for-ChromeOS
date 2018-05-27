@@ -38,11 +38,6 @@ function odd(i) {
         return false
 }
 
-// function response(e) {
-//     var urlCreator = window.URL || window.webkitURL;
-//     var imageUrl = urlCreator.createObjectURL(this.response);
-//     document.querySelector("#image").src = imageUrl;
-// }
 
 function addImage(fp, elem) {
     let xhr = new XMLHttpRequest();
@@ -58,12 +53,6 @@ function addImage(fp, elem) {
     xhr.send();
 }
 
-// function addname(fp) {
-//     let names = document.getElementById("filenames");
-//     let name = document.createElement("div");
-//     name.innerHTML = '<p>' + fp + '</p>';
-//     names.appendChild(filename);
-// }
 
 function addImages(imgs) {
     let max = imgs.length;
@@ -104,10 +93,12 @@ function addImages(imgs) {
 
 document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = document.getElementById("refreshInterval");
+    let rotateInterval = document.getElementById("rotateInterval");
     let selectPosition = document.getElementById("selectPosition");
     let limitDisplayed = 24; // TODO add as configurable option
 
     refreshInterval.value = background.refresh_interval;
+    rotateInterval.value = background.rotate_interval;
     selectPosition.value = background.wallpaper_position;
     limitDisplayed = background.limit_displayed;
     // let wallpapers = background.WallpapersList;
@@ -115,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     refreshInterval.addEventListener("input", () => {
         chrome.storage.sync.set({ "refresh_interval": refreshInterval.value } );
+    });
+    rotateInterval.addEventListener("input", () => {
+        chrome.storage.sync.set({ "rotate_interval": rotateInterval.value } );
     });
     selectPosition.addEventListener("change", () => {
         chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
