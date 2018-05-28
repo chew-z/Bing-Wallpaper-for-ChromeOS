@@ -81,7 +81,7 @@ function addImages(imgs) {
             }
         });
         wallpaper_image.addEventListener('click', () => { 
-            // background.js
+            //to background.js
             chrome.runtime.sendMessage({
                 "from": "options",
                 "subject": "action",

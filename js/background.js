@@ -15,7 +15,7 @@ function roll(min, max) {
 }
 
 /*
-Logs that storage area that changed,
+Logs that storage area has changed,
 then for each item changed,
 log its old value and its new value.
 */
@@ -178,10 +178,9 @@ function Update() {
 
 function Rotate() {
     console.log(new Date().toString() + ' Alarm set off! Rotating wallpaper ..');
-    let r = roll(0, WallpapersList.length);
+    let r = roll(0, WallpapersList.length - 1);
     let url = WallpapersList[r];
     let filename = url.substring(url.lastIndexOf("/") + 1);
-    // setWallpaper(imgURL, hash, copy);
     chrome.wallpaper.setWallpaper({
         // We can provide wallpaper image either as url or arraybuffer
         'url': 'https://www.bing.com'+ url,
@@ -201,6 +200,7 @@ chrome.browserAction.onClicked.addListener( (activeTab) => {
     chrome.tabs.create({'url': "/html/options.html" } )
 })
 
+
 chrome.alarms.onAlarm.addListener( (alarm) => {
     console.log('Alarm fired!' + JSON.stringify(alarm));
     if (alarm.name == "bing-wallpaper-update") { 
@@ -209,7 +209,10 @@ chrome.alarms.onAlarm.addListener( (alarm) => {
         Rotate();
     }
 });
+
+
 chrome.storage.onChanged.addListener(doStorageChange);
+
 // Handling incoming messages
 chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
     if (request.from == "options") {
@@ -228,6 +231,8 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
         }
     }
 });
+
+
 function start() {
     restoreOptions();
     // try updating wallpaper every half an hour
