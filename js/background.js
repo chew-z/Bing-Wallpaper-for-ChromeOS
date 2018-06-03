@@ -6,8 +6,8 @@ var refresh_interval = 180;     //In minutes
 var rotate_interval = 60;     //In minutes
 var wallpaper_position = "STRETCH";
 var debug = true;
-var WallpapersList = [];
-var limit_displayed = 24;
+// var WallpapersList = [];
+var WallpapersList = ["/az/hprichbg/rb/AsiaticElephant_ROW14371193881_1920x1080.jpg","/az/hprichbg/rb/TSSSF_ROW13060953605_1920x1080.jpg","/az/hprichbg/rb/SallyRideEarthKAM_ROW14261019694_1920x1080.jpg","/az/hprichbg/rb/WineDay_ROW11240086517_1920x1080.jpg","/az/hprichbg/rb/ShediacMarshland_ROW10694874486_1920x1080.jpg","/az/hprichbg/rb/TurtleTears_ROW8192928132_1920x1080.jpg","/az/hprichbg/rb/StormyCrater_ROW8142989560_1920x1080.jpg","/az/hprichbg/rb/Sunbird1_ROW12058461588_1920x1080.jpg","/az/hprichbg/rb/KhumbuTents_ROW5396100750_1920x1080.jpg","/az/hprichbg/rb/AerialPantanal_ROW7671225373_1920x1080.jpg","/az/hprichbg/rb/MooseLakeGrass_ROW13437486333_1920x1080.jpg","/az/hprichbg/rb/SamoaRowing_ROW11000444660_1920x1080.jpg","/az/hprichbg/rb/Liverpool_ROW14503032017_1920x1080.jpg","/az/hprichbg/rb/R2R2R_ROW11281647624_1920x1080.jpg"];
 
 
 function roll(min, max) {
@@ -81,7 +81,7 @@ function sendNotification(msg, buff) {
 }
 
 
-function setWallpaper(url, hash, message) {
+function setWallpaper(url, message) {
     let buffer = null;
     let xhr = new XMLHttpRequest(); 
     xhr.open("GET", "https://www.bing.com" + url, true); 
@@ -97,7 +97,7 @@ function setWallpaper(url, hash, message) {
                 'layout': wallpaper_position,  // STRETCH or CENTER
                 'filename': filename
             }, () => {
-                chrome.storage.local.set({lastHash: hash});
+                chrome.storage.local.set({lastURL: url});
                 sendNotification(message, buffer);
             });
         }
@@ -119,18 +119,13 @@ function Update() {
                 // If everything OK - set newest Bing wallpaper as desktop wallpaper
                 if(json.images[0].url) {
                     let imgURL = json.images[0].url;
-                    let hash = json.images[0].hsh;
+                    // let hash = json.images[0].hsh;
                     let copy = json.images[0].copyright; //copyright is more of a description
-                    // lastHash is a hash value of newest Bing wallpaper downloaded so far by extension
-                    chrome.storage.local.get({lastHash: 'None'}, (items) => {
-                        if(hash != items.lastHash)
-                            // set newest as desktop wallpaper
-                            setWallpaper(imgURL, hash, copy);
-                        else
-                            // or pass if nothing new
-                            console.log(new Date().toString() + ' New wallpaper not available');
-                    });
-                }
+                    if( !WallpapersList.includes(imgURL) ) {
+                        setWallpaper(imgURL, copy);
+
+                    }
+               }
                 // myWallapersList stores paths of wallpapers downloaded so far (relative to Downloads)
                 chrome.storage.sync.get('myWallapersList', (obj) => {
                     WallpapersList = [];
@@ -188,8 +183,6 @@ function Rotate() {
         'layout': wallpaper_position,  // STRETCH or CENTER
         'filename': filename
     }, () => {
-        // chrome.storage.local.set({lastHash: hash});
-        // sendNotification(message, buffer);
     });
     console.log(new Date().toString() + ' wallpaper rotated ' + url);
 }
@@ -233,12 +226,28 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
 });
 
 
+chrome.runtime.onInstalled.addListener( (details) => { 
+    if(details.reason == "install"){
+        console.log("This is a first install!");
+        chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
+            if (chrome.runtime.lastError)
+                console.log(chrome.runtime.lastError);
+            else
+                console.log(new Date().toString() + ' WallpapersList saved ' + JSON.stringify(WallpapersList));
+        });
+
+    }   else if(details.reason == "update"){
+        var thisVersion = chrome.runtime.getManifest().version;
+        console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
+    }
+});
+
 function start() {
     restoreOptions();
     // try updating wallpaper every half an hour
-    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 1,"periodInMinutes": parseInt(refresh_interval)});
+    chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
     console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
-    chrome.alarms.create("bing-wallpaper-rotate", {"delayInMinutes": 5,"periodInMinutes": parseInt(rotate_interval)});
+    chrome.alarms.create("bing-wallpaper-rotate", {"delayInMinutes": 1,"periodInMinutes": parseInt(rotate_interval)});
     console.log(new Date().toString() + ' Set alarm to ' + rotate_interval + ' minutes');
 }
 

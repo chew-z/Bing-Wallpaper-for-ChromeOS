@@ -67,31 +67,20 @@ function addImages(imgs) {
         }
         let column = document.createElement("div");
         column.className += "col feature";
-        column.innerHTML = '<p><a href=' + img.url + '>' + pathToName(img.filename) + '</a></p>';
-        // let a = document.createElement("a");
-        // a.href = img.url;
+        column.innerHTML = '<p><a href=https://www.bing.com' + img + '>' + pathToName(img) + '</a></p>';
         let wallpaper_image = document.createElement("img");
         wallpaper_image.className += "wallpaper";
-        chrome.extension.isAllowedFileSchemeAccess( (allowed) => {
-            if (allowed) {
-                // console.log("file access allowed");
-                addImage(img.filename, wallpaper_image);
-            } else { // This should be fallback
-                wallpaper_image.src = img.url;
-            }
-        });
+        wallpaper_image.src = 'https://www.bing.com' + img;
         wallpaper_image.addEventListener('click', () => { 
             //to background.js
             chrome.runtime.sendMessage({
                 "from": "options",
                 "subject": "action",
                 "action": "change_wallpaper",
-                "url": img.url
+                "url": 'https://www.bing.com' + img
             });
         });
         column.appendChild(wallpaper_image);
-        // a.appendChild(wallpaper_image);
-        // column.appendChild(a);
         row.appendChild(column);
         // every odd and last image - two images per row
         if ( odd(i) ) {
@@ -107,12 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = document.getElementById("refreshInterval");
     let rotateInterval = document.getElementById("rotateInterval");
     let selectPosition = document.getElementById("selectPosition");
-    let limitDisplayed = 24; // TODO add as configurable option
 
     refreshInterval.value = background.refresh_interval;
     rotateInterval.value = background.rotate_interval;
     selectPosition.value = background.wallpaper_position;
-    limitDisplayed = background.limit_displayed;
+    let wpp = background.WallpapersList;
 
     // add listeners for options change
     refreshInterval.addEventListener("input", () => {
@@ -124,16 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPosition.addEventListener("change", () => {
         chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
     });
-    // create grid with wallpapers
-    chrome.downloads.search({
-        query: ["Media/Pictures/Bing"],
-        filenameRegex: '.+_1920x1080\.jpg$',
-        limit: limitDisplayed },
-        (wpp) => {
-            if(wpp.length)  // not empty list
-                addImages(uniqWallpapers(wpp));
-        });
-    let images = document.getElementsByClassName('wallpaper');
-    for (var i = 0; i < images.length; i++) {
-            };
+    if(wpp.length)  { // not empty list
+        console.log('Found ' + wpp.length + ' files');
+        addImages(wpp);
+    }
+
 });
