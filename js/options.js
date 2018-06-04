@@ -6,14 +6,6 @@
 
 var background = chrome.extension.getBackgroundPage();
 
-/* list all background variables and their values */
-function _inspect_background() {
-    console.log("background: " + Object.prototype.toString.call(background));
-    for(let b in background) {
-        if(window.hasOwnProperty(b)) console.log(b);
-    }
-}
-
 function pathToName(fp) {
     let name = fp.substring(fp.lastIndexOf("/") + 1);
     name = name.substring(0, name.indexOf("_"));
@@ -26,32 +18,6 @@ function odd(i) {
         return true
     else
         return false
-}
-
-
-function uniqWallpapers(a) {
-    // Because Chrome brogrammers are dumb and chrome.downloads.search returns duplicates
-    // https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
-    // adjusted for our needs (unique filepath)
-    let seen = {};
-    return a.filter( (item) => {
-        return seen.hasOwnProperty(item.filename) ? false : (seen[item.filename] = true);
-    });
-}
-
-
-function addImage(fp, elem) {
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () { 
-        if (this.readyState == 4) { 
-            let urlCreator = window.URL || window.webkitURL;
-            let imageUrl = urlCreator.createObjectURL(this.response);
-            elem.src = imageUrl;
-        } 
-    }
-    xhr.open('GET', "file://" + fp);
-    xhr.responseType = 'blob';
-    xhr.send();
 }
 
 
@@ -97,10 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let rotateInterval = document.getElementById("rotateInterval");
     let selectPosition = document.getElementById("selectPosition");
 
+    let wpp = background.WallpapersList;
+    if(wpp.length)  { // not empty list
+        console.log('Found ' + wpp.length + ' wallpapers');
+        addImages(wpp);
+    }
+
     refreshInterval.value = background.refresh_interval;
     rotateInterval.value = background.rotate_interval;
     selectPosition.value = background.wallpaper_position;
-    let wpp = background.WallpapersList;
 
     // add listeners for options change
     refreshInterval.addEventListener("input", () => {
@@ -112,9 +83,4 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPosition.addEventListener("change", () => {
         chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
     });
-    if(wpp.length)  { // not empty list
-        console.log('Found ' + wpp.length + ' files');
-        addImages(wpp);
-    }
-
 });

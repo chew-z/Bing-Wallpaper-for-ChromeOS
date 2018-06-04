@@ -5,8 +5,6 @@
 var refresh_interval = 180;     //In minutes
 var rotate_interval = 60;     //In minutes
 var wallpaper_position = "STRETCH";
-var debug = true;
-// var WallpapersList = [];
 var WallpapersList = ["/az/hprichbg/rb/AsiaticElephant_ROW14371193881_1920x1080.jpg","/az/hprichbg/rb/TSSSF_ROW13060953605_1920x1080.jpg","/az/hprichbg/rb/SallyRideEarthKAM_ROW14261019694_1920x1080.jpg","/az/hprichbg/rb/WineDay_ROW11240086517_1920x1080.jpg","/az/hprichbg/rb/ShediacMarshland_ROW10694874486_1920x1080.jpg","/az/hprichbg/rb/TurtleTears_ROW8192928132_1920x1080.jpg","/az/hprichbg/rb/StormyCrater_ROW8142989560_1920x1080.jpg","/az/hprichbg/rb/Sunbird1_ROW12058461588_1920x1080.jpg","/az/hprichbg/rb/KhumbuTents_ROW5396100750_1920x1080.jpg","/az/hprichbg/rb/AerialPantanal_ROW7671225373_1920x1080.jpg","/az/hprichbg/rb/MooseLakeGrass_ROW13437486333_1920x1080.jpg","/az/hprichbg/rb/SamoaRowing_ROW11000444660_1920x1080.jpg","/az/hprichbg/rb/Liverpool_ROW14503032017_1920x1080.jpg","/az/hprichbg/rb/R2R2R_ROW11281647624_1920x1080.jpg"];
 
 
@@ -20,17 +18,15 @@ then for each item changed,
 log its old value and its new value.
 */
 function logStorageChange(changes, area) {
-    if(debug) {
-        console.log("Change in storage area: " + area);
-        let changedItems = Object.keys(changes);
-        changedItems.forEach( (key) => {
-            console.log(key + " has changed:");
-            console.log("Old value: ");
-            console.log(changes[key].oldValue);
-            console.log("New value: ");
-            console.log(changes[key].newValue);
-        });
-    }
+    console.log("Change in storage area: " + area);
+    let changedItems = Object.keys(changes);
+    changedItems.forEach( (key) => {
+        console.log(key + " has changed:");
+        console.log("Old value: ");
+        console.log(changes[key].oldValue);
+        console.log("New value: ");
+        console.log(changes[key].newValue);
+    });
 }
 
 
@@ -97,7 +93,6 @@ function setWallpaper(url, message) {
                 'layout': wallpaper_position,  // STRETCH or CENTER
                 'filename': filename
             }, () => {
-                chrome.storage.local.set({lastURL: url});
                 sendNotification(message, buffer);
             });
         }
@@ -125,7 +120,7 @@ function Update() {
                         setWallpaper(imgURL, copy);
 
                     }
-               }
+                }
                 // myWallapersList stores paths of wallpapers downloaded so far (relative to Downloads)
                 chrome.storage.sync.get('myWallapersList', (obj) => {
                     WallpapersList = [];
@@ -138,27 +133,21 @@ function Update() {
                         // let hash = image.hsh;
                         let url = image.url;
                         let filepath = 'Media/Pictures/Bing' + url.substring(url.lastIndexOf("/"));
-                        if( WallpapersList.includes(url) )
-                            // pass
-                            console.log('Found ' + url);
-                        else {
+                        if( !WallpapersList.includes(url) )
                             // add current filepath to WallpapersList
                             WallpapersList.push(url);
-                            // console.log('WallpapersList updated ' + JSON.stringify(WallpapersList));
-                            console.log('Downloading ' + filepath);
                             chrome.downloads.download({
                                 url: 'https://www.bing.com' + url,
                                 filename: filepath,
                                 conflictAction: 'overwrite'
                             });
-                        }
                     });
                     // after looping over all available wallpapers update myWallapersList in storage
                     chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
                         if (chrome.runtime.lastError)
                             console.log(chrome.runtime.lastError);
                         else
-                            console.log(new Date().toString() + ' WallpapersList saved ' + JSON.stringify(WallpapersList));
+                            console.log(new Date().toString() + ' WallpapersList saved ');
                     });
                 });
             } else {
