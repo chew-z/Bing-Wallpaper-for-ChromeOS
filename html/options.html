@@ -18,22 +18,22 @@
                 <em>This extension uses <a href="https://developer.chrome.com/apps/wallpaper">chrome.wallpaper API</a> and works only on ChromeOS</em>
             </div>
             <div class="row">
-                <h2>Click on image to set as wallpaper</h2>
+                <h2>Click on image to set it as wallpaper</h2>
                 <div id="wallpapers" class="col content">
                     <!-- Generated automatically with options.js -->
                 </div>
                 <div class="col sidebar">
-                    <div>
+                    <div class="row">
                         <label for="refreshInterval">Wallpaper background check interval (min)</label>
                         <input id="refreshInterval" type="number" class="input-option" min="30" step="15" max="1440" value="60">
                     </div>
-                    <div>
+                    <div class="row">
                         <label for="rotateInterval">Wallpaper rotate interval (min)</label>
                         <input id="rotateInterval" type="number" class="input-option" min="15" step="15" max="1440" value="60">
                     </div>
-                    <div id="positionSelection" class="">
-                        <label for="selectPosition" class="">Wallpaper position</label>
-                        <select id="selectPosition" name="select"> 
+                    <div id="positionSelection" class="row">
+                        <label for="selectPosition">Wallpaper position</label>
+                        <select id="selectPosition" class="input-select" name="select"> 
                             <option value="STRETCH" >Stretch</option>
                             <option value="CENTER">Center</option> 
                     </div>

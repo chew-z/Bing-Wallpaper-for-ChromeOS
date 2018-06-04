@@ -4,16 +4,25 @@ body {
 }
 
 .input {
-    float: left;
+    float: right;
 }
 
 .input-option {
+    float: right;
     font-weight:bold;
     text-align: right;
 }
 
 .input-list {
+    float: right;
     font-weight:bold;
+    text-align: right;
+}
+
+.input-select {
+    float: right;
+    font-weight:bold;
+    text-align: right;
 }
 
 .logo {
