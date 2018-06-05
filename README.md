@@ -5,6 +5,10 @@ Chrome extension that downloads daily picture from Bing and sets as Chromebook w
 
 I had missed my scripts for downloading and rotating wallpapers from Bing on macOS and my collection of Bing wallpapers gathered over years.
 
+## Status
+
+Since version 0.7 it is pre-release - works well.
+
 
 ## TODO
 
@@ -12,7 +16,7 @@ I had missed my scripts for downloading and rotating wallpapers from Bing on mac
 - Make proper options page
   - ~~Show gallery of pictures available offline (already downloaded)~~
   - ~~and let set selected as wallpaper~~
-  - Make downloads optional
+  - ~~Make downloads optional~~
   - Allow user to choose folder for downloading wallpapers
   - ~~Allow setting alarm's interval (checking for new wallpapers)~~
   - ~~Let choose Stretch or Center options~~
