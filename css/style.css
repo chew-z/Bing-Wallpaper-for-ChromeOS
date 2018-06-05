@@ -3,6 +3,11 @@ body {
     font-family: 'Roboto Slab', serif;
 }
 
+.options {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 .input {
     float: right;
 }
@@ -23,6 +28,15 @@ body {
     float: right;
     font-weight:bold;
     text-align: right;
+}
+
+.input-checkbox {
+    float: right;
+    font-weight:bold;
+    text-align: right;
+}
+
+.label {
 }
 
 .logo {

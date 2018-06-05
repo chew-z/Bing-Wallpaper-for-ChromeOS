@@ -23,19 +23,24 @@
                     <!-- Generated automatically with options.js -->
                 </div>
                 <div class="col sidebar">
-                    <div class="row">
-                        <label for="refreshInterval">Wallpaper background check interval (min)</label>
+                    <div class="row options">
+                        <label for="refreshInterval" class="label">Wallpaper background check interval (min)</label>
                         <input id="refreshInterval" type="number" class="input-option" min="30" step="15" max="1440" value="60">
                     </div>
-                    <div class="row">
-                        <label for="rotateInterval">Wallpaper rotate interval (min)</label>
+                    <div class="row options">
+                        <label for="rotateInterval" class="label">Wallpaper rotate interval (min)</label>
                         <input id="rotateInterval" type="number" class="input-option" min="15" step="15" max="1440" value="60">
                     </div>
-                    <div id="positionSelection" class="row">
-                        <label for="selectPosition">Wallpaper position</label>
+                    <div class="row options">
+                        <label for="selectPosition" class="label">Wallpaper position</label>
                         <select id="selectPosition" class="input-select" name="select"> 
                             <option value="STRETCH" >Stretch</option>
                             <option value="CENTER">Center</option> 
+                        </select>
+                    </div>
+                    <div class="row options">
+                        <label for="downloadWallpapers" class="label">Download wallpapers</label>
+                        <input id="downloadWallpapers" type="checkbox" class="input-checkbox">
                     </div>
                 </div>
             </div>

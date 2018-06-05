@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let refreshInterval = document.getElementById("refreshInterval");
     let rotateInterval = document.getElementById("rotateInterval");
     let selectPosition = document.getElementById("selectPosition");
+    let downloadWallpapers = document.getElementById("downloadWallpapers");
 
     let wpp = background.WallpapersList;
     if(wpp.length)  { // not empty list
@@ -72,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshInterval.value = background.refresh_interval;
     rotateInterval.value = background.rotate_interval;
     selectPosition.value = background.wallpaper_position;
+    downloadWallpapers.checked = background.download_wallpapers;
 
     // add listeners for options change
     refreshInterval.addEventListener("input", () => {
@@ -82,5 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     selectPosition.addEventListener("change", () => {
         chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
+    });
+    downloadWallpapers.addEventListener("change", () => {
+        chrome.storage.sync.set({ "download_wallpapers": downloadWallpapers.checked } );
     });
 });
