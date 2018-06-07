@@ -2,6 +2,7 @@
 
 'use strict'
 
+var bing= 'https://www.bing.com';
 var refresh_interval = 180;     //In minutes
 var rotate_interval = 60;     //In minutes
 var wallpaper_position = "STRETCH";
@@ -81,7 +82,7 @@ function sendNotification(msg, buff) {
 function setWallpaper(url, message) {
     let buffer = null;
     let xhr = new XMLHttpRequest(); 
-    xhr.open("GET", "https://www.bing.com" + url, true); 
+    xhr.open("GET", bing + url, true); 
     xhr.responseType = "arraybuffer";
     xhr.onload = function() { 
         buffer = xhr.response;
@@ -137,11 +138,12 @@ function Update() {
                         if( WallpapersList.includes(url) ) 
                             console.log('+' + url);
                         else {
-                            // add current filepath to WallpapersList
+                            console.log('-' + url);
+                            // add current url to WallpapersList
                             WallpapersList.push(url);
                             if ( download_wallpapers ) 
                                 chrome.downloads.download({
-                                    url: 'https://www.bing.com' + url,
+                                    url: bing + url,
                                     filename: filepath,
                                     conflictAction: 'overwrite'
                                 });
@@ -172,7 +174,7 @@ function Rotate() {
     let filename = url.substring(url.lastIndexOf("/") + 1);
     chrome.wallpaper.setWallpaper({
         // We can provide wallpaper image either as url or arraybuffer
-        'url': 'https://www.bing.com'+ url,
+        'url': bing + url,
         // 'data': buffer,
         'layout': wallpaper_position,  // STRETCH or CENTER
         'filename': filename
@@ -222,10 +224,13 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
 
 chrome.runtime.onUpdateAvailable.addListener( (details) => { 
     chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
-        if (chrome.runtime.lastError)
+        if (chrome.runtime.lastError) {
             console.log(chrome.runtime.lastError);
-        else
+            chrome.runtime.reload();
+        } else {
             console.log(new Date().toString() + ' WallpapersList saved ' + JSON.stringify(WallpapersList));
+            chrome.runtime.reload();
+        }
     });
 });
 
@@ -235,10 +240,8 @@ chrome.runtime.onInstalled.addListener( (details) => {
         chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
             if (chrome.runtime.lastError) {
                 console.log(chrome.runtime.lastError);
-                chrome.runtime.reload();
             } else {
                 console.log(new Date().toString() + ' WallpapersList saved ' + JSON.stringify(WallpapersList));
-                chrome.runtime.reload();
             }
         });
 
