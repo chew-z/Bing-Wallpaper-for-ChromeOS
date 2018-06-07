@@ -7,8 +7,7 @@ var refresh_interval = 180;     //In minutes
 var rotate_interval = 60;     //In minutes
 var wallpaper_position = "STRETCH";
 var download_wallpapers = true;
-var WallpapersList = ["/az/hprichbg/rb/AsiaticElephant_ROW14371193881_1920x1080.jpg","/az/hprichbg/rb/TSSSF_ROW13060953605_1920x1080.jpg","/az/hprichbg/rb/SallyRideEarthKAM_ROW14261019694_1920x1080.jpg","/az/hprichbg/rb/WineDay_ROW11240086517_1920x1080.jpg","/az/hprichbg/rb/ShediacMarshland_ROW10694874486_1920x1080.jpg","/az/hprichbg/rb/TurtleTears_ROW8192928132_1920x1080.jpg","/az/hprichbg/rb/StormyCrater_ROW8142989560_1920x1080.jpg","/az/hprichbg/rb/Sunbird1_ROW12058461588_1920x1080.jpg","/az/hprichbg/rb/KhumbuTents_ROW5396100750_1920x1080.jpg","/az/hprichbg/rb/AerialPantanal_ROW7671225373_1920x1080.jpg","/az/hprichbg/rb/MooseLakeGrass_ROW13437486333_1920x1080.jpg","/az/hprichbg/rb/SamoaRowing_ROW11000444660_1920x1080.jpg","/az/hprichbg/rb/Liverpool_ROW14503032017_1920x1080.jpg","/az/hprichbg/rb/R2R2R_ROW11281647624_1920x1080.jpg"];
-
+var WallpapersList = ["/az/hprichbg/rb/AsiaticElephant_ROW14371193881_1920x1080.jpg","/az/hprichbg/rb/TSSSF_ROW13060953605_1920x1080.jpg","/az/hprichbg/rb/SallyRideEarthKAM_ROW14261019694_1920x1080.jpg","/az/hprichbg/rb/WineDay_ROW11240086517_1920x1080.jpg","/az/hprichbg/rb/ShediacMarshland_ROW10694874486_1920x1080.jpg","/az/hprichbg/rb/TurtleTears_ROW8192928132_1920x1080.jpg","/az/hprichbg/rb/StormyCrater_ROW8142989560_1920x1080.jpg","/az/hprichbg/rb/Sunbird1_ROW12058461588_1920x1080.jpg","/az/hprichbg/rb/KhumbuTents_ROW5396100750_1920x1080.jpg","/az/hprichbg/rb/AerialPantanal_ROW7671225373_1920x1080.jpg","/az/hprichbg/rb/MooseLakeGrass_ROW13437486333_1920x1080.jpg","/az/hprichbg/rb/SamoaRowing_ROW11000444660_1920x1080.jpg","/az/hprichbg/rb/Liverpool_ROW14503032017_1920x1080.jpg","/az/hprichbg/rb/R2R2R_ROW11281647624_1920x1080.jpg","/az/hprichbg/rb/AuburnBalloons_ROW9657158205_1920x1080.jpg","/az/hprichbg/rb/HimalayanSummer_ROW11238131878_1920x1080.jpg","/az/hprichbg/rb/StaithesVillage_ROW10180973959_1920x1080.jpg"]
 
 function roll(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,7 +40,7 @@ function doStorageChange(changes, area) {
             chrome.alarms.clear("bing-wallpaper-update");
             chrome.alarms.create("bing-wallpaper-update", {"delayInMinutes": 3,"periodInMinutes": parseInt(refresh_interval)});
             console.log(new Date().toString() + ' Set alarm to ' + refresh_interval + ' minutes');
-        }
+       }
         if(key == "rotate_interval") {
             rotate_interval =  changes[key].newValue;
             chrome.alarms.clear("bing-wallpaper-rotate");
@@ -120,7 +119,6 @@ function Update() {
                     let copy = json.images[0].copyright; //copyright is more of a description
                     if( !WallpapersList.includes(imgURL) ) {
                         setWallpaper(imgURL, copy);
-
                     }
                 }
                 // myWallapersList stores paths of wallpapers downloaded so far (relative to Downloads)

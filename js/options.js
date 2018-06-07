@@ -4,6 +4,7 @@
 "use strict"
 
 
+var bing= 'https://www.bing.com';
 var background = chrome.extension.getBackgroundPage();
 
 function pathToName(fp) {
@@ -20,30 +21,28 @@ function odd(i) {
         return false
 }
 
-
 function addImages(imgs) {
     let max = imgs.length;
     let wallpapers = document.getElementById("wallpapers");
     let row;
-    imgs.forEach( (img, i) => {
-        // console.log('i = ' + i);
+    imgs.forEach( (url, i) => {
         if ( !odd(i) ) {
             row = document.createElement("div");
             row.className += "row";
         }
         let column = document.createElement("div");
         column.className += "col feature";
-        column.innerHTML = '<p><a href=https://www.bing.com' + img + '>' + pathToName(img) + '</a></p>';
+        column.innerHTML = '<p><a href=' + bing + url + '>' + pathToName(url) + '</a></p>';
         let wallpaper_image = document.createElement("img");
         wallpaper_image.className += "wallpaper";
-        wallpaper_image.src = 'https://www.bing.com' + img;
+        wallpaper_image.src = bing + url;
         wallpaper_image.addEventListener('click', () => { 
             //to background.js
             chrome.runtime.sendMessage({
                 "from": "options",
                 "subject": "action",
                 "action": "change_wallpaper",
-                "url": 'https://www.bing.com' + img
+                "url": bing + url
             });
         });
         column.appendChild(wallpaper_image);
@@ -88,4 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     downloadWallpapers.addEventListener("change", () => {
         chrome.storage.sync.set({ "download_wallpapers": downloadWallpapers.checked } );
     });
+
 });
+
