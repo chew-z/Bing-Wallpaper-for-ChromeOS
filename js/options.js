@@ -1,6 +1,3 @@
-// options.js
-// @flow
-// @flow-NotIssue
 "use strict"
 
 
