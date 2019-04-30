@@ -1,10 +1,11 @@
 'use strict';
 
 const bing = 'https://www.bing.com';
-let refresh_interval = 180; // In minutes
-let rotate_interval = 60; // In minutes
-let wallpaper_position = 'STRETCH';
-const download_wallpapers = true;
+const downloadWallpapers = true;
+const MaxWallpapers = 16;
+let refreshInterval = 180; // In minutes
+let rotateInterval = 15; // In minutes
+let wallpaperPosition = 'STRETCH';
 let WallpapersList = [];
 
 function roll(min, max) {
@@ -31,88 +32,88 @@ function logStorageChange(changes, area) {
 function doStorageChange(changes, area) {
     const changedItems = Object.keys(changes);
     changedItems.forEach((key) => {
-        if (key == 'wallpaper_position') {
-            wallpaper_position = changes[key].newValue;
+        if (key == 'wallpaperPosition') {
+            wallpaperPosition = changes[key].newValue;
         }
-        if (key == 'refresh_interval') {
-            refresh_interval = changes[key].newValue;
+        if (key == 'refreshInterval') {
+            refreshInterval = changes[key].newValue;
             chrome.alarms.clear('bing-wallpaper-update');
             chrome.alarms.create('bing-wallpaper-update', {
                 delayInMinutes: 3,
-                periodInMinutes: parseInt(refresh_interval),
+                periodInMinutes: parseInt(refreshInterval),
             });
-            console.log(`${new Date().toString()} Set alarm to ${refresh_interval} minutes`);
+            console.log(`${new Date().toString()} Set alarm to ${refreshInterval} minutes`);
         }
-        if (key == 'rotate_interval') {
-            rotate_interval = changes[key].newValue;
+        if (key == 'rotateInterval') {
+            rotateInterval = changes[key].newValue;
             chrome.alarms.clear('bing-wallpaper-rotate');
             chrome.alarms.create('bing-wallpaper-rotate', {
                 delayInMinutes: 3,
-                periodInMinutes: parseInt(rotate_interval),
+                periodInMinutes: parseInt(rotateInterval),
             });
-            console.log(`${new Date().toString()} Set alarm to ${rotate_interval} minutes`);
+            console.log(`${new Date().toString()} Set alarm to ${rotateInterval} minutes`);
         }
     });
     logStorageChange(changes, area);
 }
 
 function restoreOptions() {
-    chrome.storage.sync.get('refresh_interval', (obj) => {
-        if (obj.hasOwnProperty('refresh_interval')) {
-            refresh_interval = obj.refresh_interval;
+    chrome.storage.sync.get('refreshInterval', (obj) => {
+        if (obj.hasOwnProperty('refreshInterval')) {
+            refreshInterval = obj.refresh_interval;
         }
     });
-    chrome.storage.sync.get('wallpaper_position', (obj) => {
-        if (obj.hasOwnProperty('wallpaper_position')) {
-            wallpaper_position = obj.wallpaper_position;
+    chrome.storage.sync.get('wallpaperPosition', (obj) => {
+        if (obj.hasOwnProperty('wallpaperPosition')) {
+            wallpaperPosition = obj.wallpaper_position;
         }
     });
 }
 
-function sendNotification(msg, buff) {
-    // First we have to convert arraybuffer (of an image) to url of a blob for notification
-    const blob = new Blob([buff], { type: 'image/jpeg' });
-    const urlCreator = window.URL || window.webkitURL;
-    const imageUrl = urlCreator.createObjectURL(blob);
-    // Now we can send notification with wallpaper miniature
-    chrome.notifications.create(
-        'wallpaper-available',
-        {
-            type: 'basic',
-            iconUrl: imageUrl,
-            title: 'New Bing Wallpaper available',
-            message: msg,
-            contextMessage: 'Set as desktop wallpaper',
-        },
-        () => {},
-    );
-}
+// function sendNotification(msg, buff) {
+//     // First we have to convert arraybuffer (of an image) to url of a blob for notification
+//     const blob = new Blob([buff], { type: 'image/jpeg' });
+//     const urlCreator = window.URL || window.webkitURL;
+//     const imageUrl = urlCreator.createObjectURL(blob);
+//     // Now we can send notification with wallpaper miniature
+//     chrome.notifications.create(
+//         'wallpaper-available',
+//         {
+//             type: 'basic',
+//             iconUrl: imageUrl,
+//             title: 'New Bing Wallpaper available',
+//             message: msg,
+//             contextMessage: 'Set as desktop wallpaper',
+//         },
+//         () => {},
+//     );
+// }
 
-function setWallpaper(url, message) {
-    let buffer = null;
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', bing + url, true);
-    xhr.responseType = 'arraybuffer';
-    xhr.onload = function() {
-        buffer = xhr.response;
-        if (buffer) {
-            const filename = url.substring(url.lastIndexOf('/') + 1);
-            chrome.wallpaper.setWallpaper(
-                {
-                    // We can provide wallpaper image either as url or arraybuffer
-                    // 'url': 'https://www.bing.com'+ url,
-                    data: buffer,
-                    layout: wallpaper_position, // STRETCH or CENTER
-                    filename: filename,
-                },
-                () => {
-                    sendNotification(message, buffer);
-                },
-            );
-        }
-    };
-    xhr.send();
-}
+// function setWallpaper(url, message) {
+//     let buffer = null;
+//     const xhr = new XMLHttpRequest();
+//     xhr.open('GET', bing + url, true);
+//     xhr.responseType = 'arraybuffer';
+//     xhr.onload = () => {
+//         buffer = xhr.response;
+//         if (buffer) {
+//             const filename = url.substring(url.lastIndexOf('/') + 1);
+//             chrome.wallpaper.setWallpaper(
+//                 {
+//                     // We can provide wallpaper image either as url or arraybuffer
+//                     // 'url': 'https://www.bing.com'+ url,
+//                     data: buffer,
+//                     layout: wallpaperPosition, // STRETCH or CENTER
+//                     filename: filename,
+//                 },
+//                 () => {
+//                     sendNotification(message, buffer);
+//                 },
+//             );
+//         }
+//     };
+//     xhr.send();
+// }
 
 function update() {
     console.log(`${new Date().toString()} Alarm set off! Checking if new wallpaper is available ...`);
@@ -144,23 +145,30 @@ function update() {
                     json.images.forEach((image) => {
                         // let hash = image.hsh;
                         const { url } = image;
-                        const copy = image.copyright; // copyright is more of a description
-                        // const filepath = `Media/Pictures/Bing${url.substring(url.lastIndexOf("/"))}`;
-                        const filepath = `Media/Pictures/Bing/${url.substring(url.indexOf('id=OHR.')+7, url.indexOf('_'))}.jpg`;
+                        // const copy = image.copyright; // copyright is more of a description
+                        const filepath = `Media/Pictures/Bing/${url.substring(
+                            url.indexOf('id=OHR.') + 7,
+                            url.indexOf('_'),
+                        )}.jpg`;
                         console.log('filepath', filepath);
                         if (WallpapersList.includes(url)) {
                             console.log(`+${url}`);
                         } else {
                             console.log(`-${url}`);
-                            if (WallpapersList.length < 100) {
+                            if (WallpapersList.length < MaxWallpapers) {
                                 // add current url to WallpapersList
                                 WallpapersList.push(url);
                             } else {
                                 // rotate WallpapersList
                                 WallpapersList.shift();
+                                WallpapersList = WallpapersList.slice(
+                                    WallpapersList.length - MaxWallpapers,
+                                    MaxWallpapers + 1,
+                                );
                                 WallpapersList.push(url);
+                                console.log(WallpapersList.length);
                             }
-                            if (download_wallpapers) {
+                            if (downloadWallpapers) {
                                 chrome.downloads.download({
                                     url: bing + url,
                                     filename: filepath,
@@ -168,9 +176,6 @@ function update() {
                                 });
                             }
                         }
-                        // in some edge case we will set wallpaper up to 8 times
-                        // so let's use rotate for that
-                        // setWallpaper(url, copy);
                     });
                     // after looping over all available wallpapers update myWallapersList in storage
                     chrome.storage.sync.set({ myWallapersList: WallpapersList }, () => {
@@ -206,7 +211,7 @@ function rotate() {
             // We can provide wallpaper image either as url or arraybuffer
             url: bing + url,
             // 'data': buffer,
-            layout: wallpaper_position, // STRETCH or CENTER
+            layout: wallpaperPosition, // STRETCH or CENTER
             filename: filename,
         },
         () => {},
@@ -242,7 +247,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 {
                     // We can provide wallpaper image either as url or arraybuffer
                     url: request.url,
-                    layout: wallpaper_position, // STRETCH or CENTER
+                    layout: wallpaperPosition, // STRETCH or CENTER
                     filename: filename,
                 },
                 () => {
@@ -291,10 +296,10 @@ chrome.runtime.onInstalled.addListener((details) => {
 function start() {
     restoreOptions();
     // try updating wallpaper every half an hour
-    chrome.alarms.create('bing-wallpaper-update', { delayInMinutes: 1, periodInMinutes: parseInt(refresh_interval) });
-    console.log(`${new Date().toString()} Set alarm to ${refresh_interval} minutes`);
-    chrome.alarms.create('bing-wallpaper-rotate', { delayInMinutes: 3, periodInMinutes: parseInt(rotate_interval) });
-    console.log(`${new Date().toString()} Set alarm to ${rotate_interval} minutes`);
+    chrome.alarms.create('bing-wallpaper-update', { delayInMinutes: 1, periodInMinutes: parseInt(refreshInterval) });
+    console.log(`${new Date().toString()} Set alarm to ${refreshInterval} minutes`);
+    chrome.alarms.create('bing-wallpaper-rotate', { delayInMinutes: 3, periodInMinutes: parseInt(rotateInterval) });
+    console.log(`${new Date().toString()} Set alarm to ${rotateInterval} minutes`);
 }
 
 start();
