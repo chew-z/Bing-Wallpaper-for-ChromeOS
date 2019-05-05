@@ -2,7 +2,7 @@
 
 const bing = 'https://www.bing.com';
 const downloadWallpapers = true;
-const MaxWallpapers = 16;
+const MaxWallpapers = 24;
 let refreshInterval = 180; // In minutes
 let rotateInterval = 15; // In minutes
 let wallpaperPosition = 'STRETCH';
@@ -39,7 +39,7 @@ function doStorageChange(changes, area) {
             refreshInterval = changes[key].newValue;
             chrome.alarms.clear('bing-wallpaper-update');
             chrome.alarms.create('bing-wallpaper-update', {
-                delayInMinutes: 3,
+                delayInMinutes: 1,
                 periodInMinutes: parseInt(refreshInterval),
             });
             console.log(`${new Date().toString()} Set alarm to ${refreshInterval} minutes`);
@@ -58,14 +58,25 @@ function doStorageChange(changes, area) {
 }
 
 function restoreOptions() {
+    chrome.storage.sync.get('rotateInterval', (obj) => {
+        if (obj.hasOwnProperty('rotateInterval')) {
+            rotateInterval = obj.rotateInterval;
+        } else {
+            rotateInterval = 15;
+        }
+    });
     chrome.storage.sync.get('refreshInterval', (obj) => {
         if (obj.hasOwnProperty('refreshInterval')) {
-            refreshInterval = obj.refresh_interval;
+            refreshInterval = obj.refreshInterval;
+        } else {
+            refreshInterval = 180;
         }
     });
     chrome.storage.sync.get('wallpaperPosition', (obj) => {
         if (obj.hasOwnProperty('wallpaperPosition')) {
-            wallpaperPosition = obj.wallpaper_position;
+            wallpaperPosition = obj.wallpaperPosition;
+        } else {
+            wallpaperPosition = 'STRETCH';
         }
     });
 }

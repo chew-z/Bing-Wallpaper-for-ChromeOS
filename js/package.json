@@ -1,6 +1,6 @@
 {
   "name": "Bing-Wallpaper-for-ChromeOS",
-  "version": "0.7.16",
+  "version": "0.7.18",
   "description": "Chrome extension that downloads daily picture from Bing and sets as Chromebook wallpaper. ChromeOS only!",
   "main": "index.js",
   "engines": {

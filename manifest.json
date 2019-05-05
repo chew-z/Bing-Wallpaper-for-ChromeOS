@@ -1,30 +1,38 @@
 {
-    "manifest_version": 2,
-    "name": "Bing Wallpaper for ChromeOS",
-    "short_name": "Bing Wallpaper",
-    "version": "0.7.16",
-    "description": "Sets Bing's image of the day as the desktop wallpaper on Chromebooks and other ChromeOS devices.",
-    "icons": {
-        "16": "icons/16.png",
-        "32": "icons/32.png",
-        "48": "icons/48.png",
-        "64": "icons/64.png",
-        "128": "icons/128.png"
-    },
-    "minimum_chrome_version": "61",
-    "permissions": ["alarms", "downloads", "notifications", "storage", "wallpaper", "https://www.bing.com/"],
-    "browser_action"  :  {
-        "default_title": "Bing Wallpaper for ChromeOS",
-        "default_icon"   : "icons/32.png" 
-    },
-    "background": {
-        "scripts": [
-            "js/background.js"
-        ]
-    },
-    "options_ui": {
-        "page": "html/options.html",
-        "open_in_tab": true
-    },
-    "author": "chew-z"
+  "manifest_version": 2,
+  "name": "Bing Wallpaper for ChromeOS",
+  "short_name": "Bing Wallpaper",
+  "version": "0.7.18",
+  "description": "Sets Bing's image of the day as the desktop wallpaper on Chromebooks and other ChromeOS devices.",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "64": "icons/64.png",
+    "128": "icons/128.png"
+  },
+  "minimum_chrome_version": "61",
+  "permissions": [
+    "alarms",
+    "downloads",
+    "notifications",
+    "storage",
+    "wallpaper",
+    "https://www.bing.com/"
+  ],
+  "browser_action": {
+    "default_title": "Bing Wallpaper for ChromeOS",
+    "default_icon": "icons/32.png"
+  },
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ],
+    "persistent": true
+  },
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
+  "author": "chew-z"
 }

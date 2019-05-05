@@ -1,89 +1,129 @@
-"use strict"
+'use strict';
 
+const bing = 'https://www.bing.com';
+let refreshInterval = 180; // In minutes
+let rotateInterval = 15; // In minutes
+let wallpaperPosition = 'STRETCH';
 
-var bing= 'https://www.bing.com';
-var background = chrome.extension.getBackgroundPage();
+function restoreOptions() {
+    chrome.storage.sync.get('rotateInterval', (obj) => {
+        if (obj.hasOwnProperty('rotateInterval')) {
+            rotateInterval = obj.rotateInterval;
+        } else {
+            rotateInterval = 15;
+        }
+    });
+    chrome.storage.sync.get('refreshInterval', (obj) => {
+        if (obj.hasOwnProperty('refreshInterval')) {
+            refreshInterval = obj.refreshInterval;
+        } else {
+            refreshInterval = 180;
+        }
+    });
+    chrome.storage.sync.get('wallpaperPosition', (obj) => {
+        if (obj.hasOwnProperty('wallpaperPosition')) {
+            wallpaperPosition = obj.wallpaperPosition;
+        } else {
+            wallpaperPosition = 'STRETCH';
+        }
+    });
+}
 
 function pathToName(fp) {
-    let name = fp.substring(fp.lastIndexOf("/") + 1);
-    name = name.substring(0, name.indexOf("_"));
-    name = name.split(/(?=[A-Z])/).join(" ");
+    const filepath = fp.substring(fp.indexOf('id=OHR.') + 7, fp.indexOf('_'));
+    console.log('filepath', filepath);
+
+    // let name = fp.substring(fp.lastIndexOf('/') + 1);
+    // name = name.substring(0, name.indexOf('_'));
+    const name = filepath.split(/(?=[A-Z])/).join(' ');
+
     return name;
 }
 
 function odd(i) {
-    if(i & 1) 
-        return true
-    else
-        return false
+    if (i & 1) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function addImages(imgs) {
-    let max = imgs.length;
-    let wallpapers = document.getElementById("wallpapers");
+    const max = imgs.length;
+    const wallpapers = document.getElementById('wallpapers');
     let row;
-    imgs.forEach( (url, i) => {
-        if ( !odd(i) ) {
-            row = document.createElement("div");
-            row.className += "row";
+    imgs.forEach((url, i) => {
+        if (!odd(i)) {
+            row = document.createElement('div');
+            row.className += 'row';
         }
-        let column = document.createElement("div");
-        column.className += "col feature";
-        column.innerHTML = '<p><a href=' + bing + url + '>' + pathToName(url) + '</a></p>';
-        let wallpaper_image = document.createElement("img");
-        wallpaper_image.className += "wallpaper";
-        wallpaper_image.src = bing + url;
-        wallpaper_image.addEventListener('click', () => { 
-            //to background.js
+        const column = document.createElement('div');
+        column.className += 'col feature';
+        column.innerHTML = `<p><a href=${bing}${url}>${pathToName(url)}</a></p>`;
+        const wallpaperImage = document.createElement('img');
+        wallpaperImage.className += 'wallpaper';
+        wallpaperImage.src = bing + url;
+        wallpaperImage.addEventListener('click', () => {
+            // to background.js
             chrome.runtime.sendMessage({
-                "from": "options",
-                "subject": "action",
-                "action": "change_wallpaper",
-                "url": bing + url
+                from: 'options',
+                subject: 'action',
+                action: 'change_wallpaper',
+                url: bing + url,
             });
         });
-        column.appendChild(wallpaper_image);
+        column.appendChild(wallpaperImage);
         row.appendChild(column);
         // every odd and last image - two images per row
-        if ( odd(i) ) {
+        if (odd(i)) {
             wallpapers.appendChild(row);
         } else {
-            if (i == max - 1)
+            if (i == max - 1) {
                 wallpapers.appendChild(row);
+            }
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    let refreshInterval = document.getElementById("refreshInterval");
-    let rotateInterval = document.getElementById("rotateInterval");
-    let selectPosition = document.getElementById("selectPosition");
-    let downloadWallpapers = document.getElementById("downloadWallpapers");
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded');
+    chrome.storage.sync.get('myWallapersList', (obj) => {
+        let wpp = [];
+        if (obj.hasOwnProperty('myWallapersList')) {
+            wpp = obj.myWallapersList;
+            console.log(`Found in storage ${JSON.stringify(wpp)}`);
+        }
+        if (wpp.length) {
+            // not empty list
+            console.log(`Found ${wpp.length} wallpapers`);
+            addImages(wpp);
+        }
+    });
 
-    let wpp = background.WallpapersList;
-    if(wpp.length)  { // not empty list
-        console.log('Found ' + wpp.length + ' wallpapers');
-        addImages(wpp);
-    }
+    const refreshControl = document.getElementById('refreshInterval');
+    const rotateControl = document.getElementById('rotateInterval');
+    const selectPositionControl = document.getElementById('selectPosition');
+    const downloadWallpapersControl = document.getElementById('downloadWallpapers');
 
-    refreshInterval.value = background.refresh_interval;
-    rotateInterval.value = background.rotate_interval;
-    selectPosition.value = background.wallpaper_position;
-    downloadWallpapers.checked = background.download_wallpapers;
-
+    restoreOptions();
+    refreshControl.value = refreshInterval;
+    chrome.storage.sync.set({ refreshInterval: refreshControl.value });
+    rotateControl.value = rotateInterval;
+    chrome.storage.sync.set({ rotateInterval: rotateControl.value });
+    selectPositionControl.value = wallpaperPosition;
+    chrome.storage.sync.set({ wallpaperPosition: selectPositionControl.value });
+    // downloadWallpapersControl.checked = background.downloadWallpapers;
     // add listeners for options change
-    refreshInterval.addEventListener("input", () => {
-        chrome.storage.sync.set({ "refresh_interval": refreshInterval.value } );
+    refreshControl.addEventListener('input', () => {
+        chrome.storage.sync.set({ refreshInterval: refreshControl.value });
     });
-    rotateInterval.addEventListener("input", () => {
-        chrome.storage.sync.set({ "rotate_interval": rotateInterval.value } );
+    rotateControl.addEventListener('input', () => {
+        chrome.storage.sync.set({ rotateInterval: rotateControl.value });
     });
-    selectPosition.addEventListener("change", () => {
-        chrome.storage.sync.set({ "wallpaper_position": selectPosition.value } );
+    selectPositionControl.addEventListener('change', () => {
+        chrome.storage.sync.set({ wallpaperPosition: selectPositionControl.value });
     });
-    downloadWallpapers.addEventListener("change", () => {
-        chrome.storage.sync.set({ "download_wallpapers": downloadWallpapers.checked } );
+    downloadWallpapersControl.addEventListener('change', () => {
+        chrome.storage.sync.set({ downloadWallpapers: downloadWallpapersControl.checked });
     });
-
 });
-
