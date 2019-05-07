@@ -31,10 +31,7 @@ function restoreOptions() {
 
 function pathToName(fp) {
     const filepath = fp.substring(fp.indexOf('id=OHR.') + 7, fp.indexOf('_'));
-    console.log('filepath', filepath);
-
-    // let name = fp.substring(fp.lastIndexOf('/') + 1);
-    // name = name.substring(0, name.indexOf('_'));
+    // console.log('filepath', filepath);
     const name = filepath.split(/(?=[A-Z])/).join(' ');
 
     return name;

@@ -12,6 +12,14 @@ function roll(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function pathToName(fp) {
+    const filepath = fp.substring(fp.indexOf('id=OHR.') + 7, fp.indexOf('_'));
+    // console.log('filepath', filepath);
+    const name = filepath.split(/(?=[A-Z])/).join(' ');
+
+    return name;
+}
+
 /*
 Logs that storage area has changed,
 then for each item changed,
@@ -111,11 +119,10 @@ function update() {
                             url.indexOf('id=OHR.') + 7,
                             url.indexOf('_'),
                         )}.jpg`;
-                        console.log('filepath', filepath);
                         if (WallpapersList.includes(url)) {
-                            console.log(`+${url}`);
+                            console.log(`+${filepath}`);
                         } else {
-                            console.log(`-${url}`);
+                            console.log(`-${filepath}`);
                             if (WallpapersList.length < MaxWallpapers) {
                                 // add current url to WallpapersList
                                 WallpapersList.push(url);
@@ -166,18 +173,19 @@ function rotate() {
 
     const r = roll(0, WallpapersList.length - 1);
     const url = WallpapersList[r];
-    const filename = url.substring(url.lastIndexOf('/') + 1);
+    const filepath = url.substring(url.lastIndexOf('/') + 1);
+    const filename = pathToName(filepath);
     chrome.wallpaper.setWallpaper(
         {
             // We can provide wallpaper image either as url or arraybuffer
             url: bing + url,
             // 'data': buffer,
             layout: wallpaperPosition, // STRETCH or CENTER
-            filename: filename,
+            filename: filepath,
         },
         () => {},
     );
-    console.log(`${new Date().toString()} wallpaper rotated ${url}`);
+    console.log(`${new Date().toString()} wallpaper rotated ${filename}`);
 }
 // When clicked extension icon
 // chrome.browserAction.onClicked will not fire if the browser action has a popup
@@ -203,16 +211,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log(`Pop from options ${request.subject} ${request.action} ${request.url}`);
         if (request.subject == 'action' && request.action == 'change_wallpaper') {
             // setWallpaper(imgURL, hash, copy);
-            const filename = request.url.substring(request.url.lastIndexOf('/') + 1);
+            const filepath = request.url.substring(request.url.lastIndexOf('/') + 1);
+            const filename = pathToName(filepath);
             chrome.wallpaper.setWallpaper(
                 {
                     // We can provide wallpaper image either as url or arraybuffer
                     url: request.url,
                     layout: wallpaperPosition, // STRETCH or CENTER
-                    filename: filename,
+                    filename: filepath,
                 },
                 () => {
-                    console.log(`${new Date().toString()} wallpaper rotated ${request.url}`);
+                    console.log(`${new Date().toString()} wallpaper rotated ${filename}`);
                 },
             );
         }
