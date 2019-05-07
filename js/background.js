@@ -58,6 +58,11 @@ function doStorageChange(changes, area) {
 }
 
 function restoreOptions() {
+    chrome.storage.sync.get('myWallapersList', (obj) => {
+        if (obj.hasOwnProperty('myWallapersList')) {
+            WallpapersList = obj.myWallapersList;
+        }
+    });
     chrome.storage.sync.get('rotateInterval', (obj) => {
         if (obj.hasOwnProperty('rotateInterval')) {
             rotateInterval = obj.rotateInterval;
@@ -81,51 +86,6 @@ function restoreOptions() {
     });
 }
 
-// function sendNotification(msg, buff) {
-//     // First we have to convert arraybuffer (of an image) to url of a blob for notification
-//     const blob = new Blob([buff], { type: 'image/jpeg' });
-//     const urlCreator = window.URL || window.webkitURL;
-//     const imageUrl = urlCreator.createObjectURL(blob);
-//     // Now we can send notification with wallpaper miniature
-//     chrome.notifications.create(
-//         'wallpaper-available',
-//         {
-//             type: 'basic',
-//             iconUrl: imageUrl,
-//             title: 'New Bing Wallpaper available',
-//             message: msg,
-//             contextMessage: 'Set as desktop wallpaper',
-//         },
-//         () => {},
-//     );
-// }
-
-// function setWallpaper(url, message) {
-//     let buffer = null;
-//     const xhr = new XMLHttpRequest();
-//     xhr.open('GET', bing + url, true);
-//     xhr.responseType = 'arraybuffer';
-//     xhr.onload = () => {
-//         buffer = xhr.response;
-//         if (buffer) {
-//             const filename = url.substring(url.lastIndexOf('/') + 1);
-//             chrome.wallpaper.setWallpaper(
-//                 {
-//                     // We can provide wallpaper image either as url or arraybuffer
-//                     // 'url': 'https://www.bing.com'+ url,
-//                     data: buffer,
-//                     layout: wallpaperPosition, // STRETCH or CENTER
-//                     filename: filename,
-//                 },
-//                 () => {
-//                     sendNotification(message, buffer);
-//                 },
-//             );
-//         }
-//     };
-//     xhr.send();
-// }
-
 function update() {
     console.log(`${new Date().toString()} Alarm set off! Checking if new wallpaper is available ...`);
     // First get JSON describing latest Bing wallpapers.
@@ -136,16 +96,6 @@ function update() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 const json = this.response;
-                // If everything OK - set newest Bing wallpaper as desktop wallpaper
-                // if (json.images[0].url) {
-                //     const imgURL = json.images[0].url;
-                //     // let hash = json.images[0].hsh;
-                //     const copy = json.images[0].copyright; // copyright is more of a description
-                //     if (!WallpapersList.includes(imgURL)) {
-                //         setWallpaper(imgURL, copy);
-                //     }
-                // }
-                // myWallapersList stores paths of wallpapers downloaded so far (relative to Downloads)
                 chrome.storage.sync.get('myWallapersList', (obj) => {
                     WallpapersList = [];
                     if (obj.hasOwnProperty('myWallapersList')) {
@@ -306,7 +256,6 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 function start() {
     restoreOptions();
-    // try updating wallpaper every half an hour
     chrome.alarms.create('bing-wallpaper-update', { delayInMinutes: 1, periodInMinutes: parseInt(refreshInterval) });
     console.log(`${new Date().toString()} Set alarm to ${refreshInterval} minutes`);
     chrome.alarms.create('bing-wallpaper-rotate', { delayInMinutes: 3, periodInMinutes: parseInt(rotateInterval) });
