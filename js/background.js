@@ -73,21 +73,21 @@ function restoreOptions() {
     });
     chrome.storage.sync.get('rotateInterval', (obj) => {
         if (obj.hasOwnProperty('rotateInterval')) {
-            rotateInterval = obj.rotateInterval;
+            ({ rotateInterval } = obj.rotateInterval);
         } else {
             rotateInterval = 15;
         }
     });
     chrome.storage.sync.get('refreshInterval', (obj) => {
         if (obj.hasOwnProperty('refreshInterval')) {
-            refreshInterval = obj.refreshInterval;
+            ({ refreshInterval } = obj.refreshInterval);
         } else {
             refreshInterval = 180;
         }
     });
     chrome.storage.sync.get('wallpaperPosition', (obj) => {
         if (obj.hasOwnProperty('wallpaperPosition')) {
-            wallpaperPosition = obj.wallpaperPosition;
+            ({ wallpaperPosition } = obj.wallpaperPosition);
         } else {
             wallpaperPosition = 'STRETCH';
         }
@@ -100,7 +100,7 @@ function update() {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8');
     xhr.responseType = 'json';
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function xhrState() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 const json = this.response;
