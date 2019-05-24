@@ -164,13 +164,13 @@ function update() {
 }
 
 function rotate() {
-    console.log(`${new Date().toString()} Alarm set off! Rotating wallpaper ..`);
     if (WallpapersList.length < 1) {
         console.log(`${new Date().toString()} WallpapersList empty`);
 
         return;
     }
 
+    console.log(`${new Date().toString()} Alarm set off! Rotating wallpaper ..`);
     const r = roll(0, WallpapersList.length - 1);
     const url = WallpapersList[r];
     const filepath = url.substring(url.lastIndexOf('/') + 1);
@@ -179,9 +179,8 @@ function rotate() {
         {
             // We can provide wallpaper image either as url or arraybuffer
             url: bing + url,
-            // 'data': buffer,
-            layout: wallpaperPosition, // STRETCH or CENTER
-            filename: filepath,
+            layout: 'STRETCH', // STRETCH or CENTER
+            filename: filename,
         },
         () => {},
     );
@@ -213,6 +212,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             // setWallpaper(imgURL, hash, copy);
             const filepath = request.url.substring(request.url.lastIndexOf('/') + 1);
             const filename = pathToName(filepath);
+            const wallpaperPosition = 'STRETCH';
             chrome.wallpaper.setWallpaper(
                 {
                     // We can provide wallpaper image either as url or arraybuffer

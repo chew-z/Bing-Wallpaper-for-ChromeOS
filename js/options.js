@@ -104,11 +104,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     restoreOptions();
     refreshControl.value = refreshInterval;
-    chrome.storage.sync.set({ refreshInterval: refreshControl.value });
+    // chrome.storage.sync.set({ refreshInterval: refreshControl.value });
     rotateControl.value = rotateInterval;
-    chrome.storage.sync.set({ rotateInterval: rotateControl.value });
+    // chrome.storage.sync.set({ rotateInterval: rotateControl.value });
     selectPositionControl.value = wallpaperPosition;
-    chrome.storage.sync.set({ wallpaperPosition: selectPositionControl.value });
+    console.log('selectPositionControl.value ', selectPositionControl.value);
+    // chrome.storage.sync.set({ wallpaperPosition: selectPositionControl.value });
     // downloadWallpapersControl.checked = background.downloadWallpapers;
     // add listeners for options change
     refreshControl.addEventListener('input', () => {
