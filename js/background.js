@@ -123,18 +123,18 @@ function update() {
                             console.log(`+${filepath}`);
                         } else {
                             console.log(`-${filepath}`);
+                            console.log('WallpapersList length: ', WallpapersList.length);
                             if (WallpapersList.length < MaxWallpapers) {
                                 // add current url to WallpapersList
                                 WallpapersList.push(url);
                             } else {
                                 // rotate WallpapersList
                                 WallpapersList.shift();
-                                WallpapersList = WallpapersList.slice(
-                                    WallpapersList.length - MaxWallpapers,
-                                    MaxWallpapers + 1,
-                                );
+                                // WallpapersList = WallpapersList.slice(
+                                //     WallpapersList.length - MaxWallpapers,
+                                //     MaxWallpapers + 1,
+                                // );
                                 WallpapersList.push(url);
-                                console.log(WallpapersList.length);
                             }
                             if (downloadWallpapers) {
                                 chrome.downloads.download({
